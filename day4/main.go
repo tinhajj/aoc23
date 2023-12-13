@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"math"
 	"os"
 	"regexp"
 	"strconv"
@@ -9,14 +10,20 @@ import (
 )
 
 type Card struct {
+	id      int
 	winning []int
+	values  []int
+
+	matches []int
 }
 
 func main() {
 	bytes, _ := os.ReadFile("input.txt")
 	content := string(bytes)
-	lines := strings.Split(content, "\r\n")
+	lines := strings.Split(content, "\n")
 	var part string
+
+	cards := []*Card{}
 
 	for _, line := range lines {
 		part = capture(`Card\s*(\d*):`, line)
@@ -36,7 +43,6 @@ func main() {
 
 		myNumbers := []int{}
 		part = capture(`Card.*:[\d\s]* | ([\d\s]*)`, line)
-		fmt.Println("the part is", part)
 		parts = strings.Split(part, " ")
 		for _, part := range parts {
 			number, err := strconv.Atoi(part)
@@ -46,25 +52,41 @@ func main() {
 			myNumbers = append(myNumbers, number)
 		}
 
-		fmt.Println("card number", cardNumber)
-		fmt.Println("winning numbers", winningNumbers)
-		fmt.Println("my numbers", myNumbers)
+		cards = append(cards, &Card{id: cardNumber, winning: winningNumbers, values: myNumbers})
 	}
+
+	sum := 0
+	for _, card := range cards {
+		for _, value := range card.values {
+			for _, win := range card.winning {
+				if value == win {
+					card.matches = append(card.matches, value)
+					break
+				}
+			}
+		}
+
+		fmt.Println(int(math.Pow(2, float64(len(card.matches)))))
+		if len(card.matches) == 0 {
+			continue
+		}
+		sum += int(math.Pow(2, float64(len(card.matches)-1)))
+	}
+	fmt.Println(sum)
 }
 
 func capture(exp string, haystack string) string {
 	re := regexp.MustCompile(exp)
 	matches := re.FindAllStringSubmatch(haystack, -1)
-	fmt.Println("all submatches:", matches)
-	//fmt.Println("from the capture")
-	//for i, result := range results {
-	//	fmt.Printf("idx: %d, value: %s ", i, result)
+
+	//for i, result := range matches {
+	//	fmt.Printf("idx: %d, value: %s\n", i, result)
 	//}
 
-	for i, match := range matches {
-		fmt.Println("looking at", i, match, len(match))
-		if len(match) >= 2 {
-			fmt.Println("the chosen submatch", match[1])
+	for _, match := range matches {
+		//fmt.Println("looking at", i, match, len(match))
+		if len(match) >= 2 && match[1] != "" {
+			//fmt.Println("the chosen submatch", match[1])
 			return match[1]
 		}
 	}
