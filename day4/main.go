@@ -20,7 +20,7 @@ type Card struct {
 func main() {
 	bytes, _ := os.ReadFile("input.txt")
 	content := string(bytes)
-	lines := strings.Split(content, "\n")
+	lines := strings.Split(content, "\r\n")
 	var part string
 
 	cards := []*Card{}
@@ -73,6 +73,23 @@ func main() {
 		sum += int(math.Pow(2, float64(len(card.matches)-1)))
 	}
 	fmt.Println(sum)
+
+	scratches := 0
+	stack := cards
+	for i := 0; i < len(stack); i++ {
+		scratches++
+		card := stack[i]
+		matches := len(card.matches)
+		end := card.id + matches
+		if card.id == len(cards) {
+			continue
+		}
+		if end > len(cards)-1 {
+			end = len(cards) - 1
+		}
+		stack = append(stack, cards[card.id:end]...)
+	}
+	fmt.Println(len(stack))
 }
 
 func capture(exp string, haystack string) string {
