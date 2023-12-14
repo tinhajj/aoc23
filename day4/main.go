@@ -84,8 +84,8 @@ func main() {
 		if card.id == len(cards) {
 			continue
 		}
-		if end > len(cards)-1 {
-			end = len(cards) - 1
+		if end > len(cards) {
+			end = len(cards)
 		}
 		stack = append(stack, cards[card.id:end]...)
 	}
