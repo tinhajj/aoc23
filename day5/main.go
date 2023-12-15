@@ -56,8 +56,33 @@ func main() {
 			amaps = append(amaps, adventMap)
 		}
 	}
+
+	endings := []int{}
+	for _, seed := range seeds {
+		current := seed
+		for _, amap := range amaps {
+			for _, arange := range amap.ranges {
+				sourceMax := arange.source + arange.run - 1
+				if current >= arange.source && current <= sourceMax {
+					difference := sourceMax - current
+					current = arange.destination + difference
+					break
+				}
+			}
+		}
+		fmt.Println("started at", seed, "ended at", current)
+		endings = append(endings, current)
+	}
+
+	smallest := endings[0]
+	for _, ending := range endings {
+		if ending < smallest {
+			smallest = ending
+		}
+	}
 	fmt.Println(seeds)
 	fmt.Println(amaps)
+	fmt.Println("smallest ending", smallest)
 }
 
 func capture(exp string, haystack string) string {
