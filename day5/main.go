@@ -64,7 +64,7 @@ func main() {
 			for _, arange := range amap.ranges {
 				sourceMax := arange.source + arange.run - 1
 				if current >= arange.source && current <= sourceMax {
-					difference := sourceMax - current
+					difference := current - arange.source
 					current = arange.destination + difference
 					break
 				}
