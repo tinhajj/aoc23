@@ -53,6 +53,7 @@ func main() {
 		ah := &adventHand{hand: hand, bid: bid}
 		getSuit(ah)
 		handReplace(ah)
+		upgrade(ah)
 		hands = append(hands, ah)
 	}
 
@@ -71,7 +72,7 @@ func main() {
 	product := 0
 	for i, hand := range hands {
 		product += (i + 1) * hand.bid
-		fmt.Println(hand)
+		fmt.Printf("%+v suit is %s\n", hand, hand.suit.String())
 	}
 	fmt.Println(product)
 }
@@ -111,7 +112,7 @@ func handReplace(ah *adventHand) {
 	ah.handCompare = strings.Replace(ah.handCompare, "A", "Z", -1)
 	ah.handCompare = strings.Replace(ah.handCompare, "K", "Y", -1)
 	ah.handCompare = strings.Replace(ah.handCompare, "Q", "X", -1)
-	ah.handCompare = strings.Replace(ah.handCompare, "J", "W", -1)
+	ah.handCompare = strings.Replace(ah.handCompare, "J", "1", -1)
 	ah.handCompare = strings.Replace(ah.handCompare, "T", "V", -1)
 }
 
@@ -136,4 +137,47 @@ func sameSlice(first, second []int) bool {
 	}
 
 	return true
+}
+
+func upgrade(ah *adventHand) {
+	if !strings.Contains(ah.hand, "J") {
+		return
+	}
+
+	jokers := numberOfJokers(ah)
+
+	if ah.suit == fourofkind || ah.suit == fullhouse {
+		ah.suit = fiveofkind
+		return
+	}
+
+	if ah.suit == threeofkind {
+		ah.suit = fourofkind
+		return
+	}
+
+	if ah.suit == twopair {
+		if jokers == 2 {
+			ah.suit = fourofkind
+			return
+		}
+		if jokers == 1 {
+			ah.suit = fullhouse
+			return
+		}
+	}
+
+	if ah.suit == onepair {
+		ah.suit = threeofkind
+		return
+	}
+
+	if ah.suit == highcard {
+		ah.suit = onepair
+		return
+	}
+}
+
+func numberOfJokers(ah *adventHand) int {
+	return strings.Count(ah.hand, "J")
 }
